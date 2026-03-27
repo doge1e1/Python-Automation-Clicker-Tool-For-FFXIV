@@ -40,3 +40,5 @@ Improving usability with stop controls and parameter settings
 Disclaimer
 
 This project is for learning and automation practice.
+
+![UI Demo](assets/ui-demo.png)
