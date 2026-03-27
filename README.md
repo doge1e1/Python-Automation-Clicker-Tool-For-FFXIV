@@ -41,4 +41,4 @@ Disclaimer
 
 This project is for learning and automation practice.
 
-![UI Demo](assets/ui-demo.png)
+![UI Demo](assets/ui.png)
