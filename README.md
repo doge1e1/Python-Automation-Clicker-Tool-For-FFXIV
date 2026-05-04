@@ -1,44 +1,149 @@
-Python Automation Clicker Tool
+# 🎮 操作錄製器 — Python Desktop Automation Tool
 
-A small Python automation project for handling repetitive desktop mouse operations.
+參考 BlueStacks 內建腳本錄製功能設計，支援錄製一段時間內的鍵盤與滑鼠操作，並可匯出／匯入 JSON 格式的腳本檔，讓重複性操作得以自動化執行。
 
-Features
-Record mouse coordinates
-Save coordinates to JSON
-Run automated clicking workflows
-Support simple fixed-point clicking
-Support grid-based clicking
-GUI version with configurable run count and delay
-Manual stop mechanism for safer execution
-Tech Stack
-Python
-PyAutoGUI
-Tkinter
-JSON
-threading
-Project Structure
-main.py - main GUI automation tool
-coord_recorder.py - record key mouse positions
-multi_coord_recorder.py - record multiple positions
-simple_clicker.py - basic fixed-point auto clicker
-grid_clicker.py - grid-based click automation
-How to Run
+---
 
-Install dependencies:
+## ✨ 功能特色
 
-pip install -r requirements.txt
+| 功能 | 說明 |
+|------|------|
+| 🎥 操作錄製 | 即時捕捉滑鼠點擊位置與鍵盤按鍵，並記錄精確的時間戳記 |
+| ⏱️ 時序還原 | 播放時依照錄製的時間間隔重現每個操作，行為與錄製時一致 |
+| 💾 匯出 JSON | 將錄製結果存成可攜式 JSON 檔，方便備份或分享 |
+| 📁 匯入 JSON | 載入現有腳本直接播放，無需重新錄製 |
+| 🔁 重複播放 | 可設定執行次數（0 = 無限循環）與每輪間隔秒數 |
+| 🚫 隨時中止 | 播放途中可按 DEL 鍵或點按鈕立即停止 |
+| ⌨️ 全域熱鍵 | 不需切換視窗即可控制錄製與停止 |
 
-Run the GUI tool:
+---
 
-python main.py
-What I Learned
-Building desktop automation tools with Python
-Using Tkinter to create simple GUI applications
-Managing automation tasks with threading
-Saving and loading configuration through JSON
-Improving usability with stop controls and parameter settings
-Disclaimer
+## 🖥️ 介面截圖
 
-This project is for learning and automation practice.
+```
+┌─────────────────────────────────┐
+│  操作錄製器 (支援匯入匯出)         │
+│  狀態: 待機中                     │
+│                                  │
+│  💡 錄製建議                      │
+│  請將焦點目標設定在螢幕左邊        │
+│  角色位置請接近螢幕右邊            │
+│                                  │
+│  🎥 錄製控制                      │
+│  [🔴 開始錄製 (F9)]               │
+│  [⏹️ 停止錄製 (End)]              │
+│                                  │
+│  📂 檔案管理                      │
+│  [💾 匯出錄製檔 (Save JSON)]      │
+│  [📁 匯入錄製檔 (Load JSON)]      │
+│                                  │
+│  ⚙️ 播放設定                      │
+│  播放次數: [  1  ]                │
+│  間隔(秒): [ 1.0 ]                │
+│  [▶️ 開始播放]                    │
+│  [🚫 停止播放 (DEL)]              │
+└─────────────────────────────────┘
+```
 
-![UI Demo](asset/ui.png)
+---
+
+## ⌨️ 熱鍵一覽
+
+| 熱鍵 | 功能 |
+|------|------|
+| `F9` | 開始錄製 |
+| `End` | 停止錄製 |
+| `Delete` | 停止播放 |
+
+> 熱鍵為全域監聽，在任何視窗下皆有效。
+
+---
+
+## 📦 安裝依賴
+
+```bash
+pip install pynput
+```
+
+| 套件 | 用途 |
+|------|------|
+| `pynput` | 滑鼠與鍵盤的監聽及控制 |
+| `tkinter` | GUI 介面（Python 內建） |
+| `threading` | 背景執行播放，避免 UI 凍結 |
+| `json` | 腳本檔的儲存與讀取 |
+
+---
+
+## 🚀 執行方式
+
+```bash
+python tea.py
+```
+
+---
+
+## 📄 JSON 格式說明
+
+錄製結果會存成如下格式的 JSON，每個事件包含類型、內容與時間偏移（秒）：
+
+```json
+[
+    {
+        "type": "mouse",
+        "x": 968,
+        "y": 223,
+        "button": "Button.left",
+        "pressed": true,
+        "time": 0.548
+    },
+    {
+        "type": "key",
+        "key": "Key.f10",
+        "time": 1.135
+    },
+    {
+        "type": "key",
+        "key": "`",
+        "time": 1.888
+    }
+]
+```
+
+| 欄位 | 說明 |
+|------|------|
+| `type` | 事件類型：`"mouse"` 或 `"key"` |
+| `x`, `y` | 滑鼠點擊的螢幕座標（僅 mouse 事件） |
+| `button` | 滑鼠按鍵：`Button.left` 或 `Button.right` |
+| `pressed` | `true` = 按下，`false` = 放開（僅 mouse 事件） |
+| `key` | 鍵盤按鍵字串（`Key.f10`、`` ` ``、`<vk_code>` 等格式） |
+| `time` | 距錄製開始的時間（秒），用於播放時還原時序 |
+
+---
+
+## ⚙️ 播放設定說明
+
+- **播放次數**：填入正整數執行指定次數；填 `0` 代表無限循環，直到手動按下 DEL 停止。
+- **間隔(秒)**：每輪操作結束後的等待時間，適合需要等待遊戲動畫或載入的場景。
+
+---
+
+## 🏗️ 專案架構
+
+```
+.
+├── tea.py          # 主程式（GUI + 錄製 + 播放邏輯）
+├── tea1.json       # 範例腳本檔
+└── README.md
+```
+
+---
+
+## 💡 設計靈感
+
+本工具設計參考 **BlueStacks 內建腳本錄製功能**，核心概念是「錄製操作流程 → 匯出 JSON → 任意次數重播」，讓原本需要手動重複的遊戲操作可以自動執行。
+
+---
+
+## ⚠️ 免責聲明
+
+本工具僅供學習與自動化技術研究用途，請遵守各平台的使用條款。
